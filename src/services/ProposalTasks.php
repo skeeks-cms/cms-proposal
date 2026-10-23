@@ -7,6 +7,7 @@
 
 namespace skeeks\cms\proposal\services;
 
+use skeeks\cms\communication\services\Campaigns;
 use skeeks\cms\helpers\CmsScheduleHelper;
 use skeeks\cms\models\CmsCompany;
 use skeeks\cms\models\CmsDeal;
@@ -44,7 +45,9 @@ class ProposalTasks
     /** The task made now, or null when the rule is off or an open task exists. */
     public function onFirstView(CmsProposal $proposal, CmsProposalSend $send, ?int $now = null): ?CmsTask
     {
-        if (!ProposalSettings::taskOnFirstView((int)$proposal->cms_site_id)) {
+        // A letter of a mailing campaign: the campaign setting decides, otherwise the setting of the section.
+        $byCampaign = $send->cms_comm_message_id ? Campaigns::taskOnOpen((int)$send->cms_comm_message_id) : null;
+        if ($byCampaign === false || ($byCampaign === null && !ProposalSettings::taskOnFirstView((int)$proposal->cms_site_id))) {
             return null;
         }
         $executorId = ProposalNotifier::recipientId($proposal);

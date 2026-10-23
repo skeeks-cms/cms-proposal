@@ -33,7 +33,7 @@ $db->createCommand()->createTable('cms_proposal_view', ['id' => 'pk', 'created_a
 $db->createCommand()->createTable('cms_proposal_question', ['id' => 'pk', 'created_at' => 'integer not null', 'cms_proposal_id' => 'integer not null', 'cms_proposal_send_id' => 'integer not null', 'cms_proposal_version_id' => 'integer', 'name' => 'string', 'contact' => 'string', 'text' => 'text not null', 'cms_comm_message_id' => 'integer', 'ip' => 'string', 'user_agent' => 'string'])->execute();
 $db->createCommand()->createTable('cms_web_notify', ['id' => 'pk', 'created_at' => 'integer', 'updated_at' => 'integer', 'created_by' => 'integer', 'updated_by' => 'integer', 'name' => 'string', 'comment' => 'text', 'url' => 'string', 'model_code' => 'string', 'model_id' => 'integer', 'cms_user_id' => 'integer', 'is_read' => 'integer default 0'])->execute();
 $db->createCommand()->createTable('cms_comm_conversation', ['id' => 'pk', 'created_at' => 'integer', 'updated_at' => 'integer', 'cms_site_id' => 'integer', 'channel' => 'string', 'thread_key' => 'string', 'subject' => 'string', 'last_message_at' => 'integer', 'assigned_user_id' => 'integer', 'assigned_at' => 'integer', 'assigned_by' => 'integer'])->execute();
-$db->createCommand()->createTable('cms_comm_message', ['id' => 'pk', 'created_at' => 'integer', 'updated_at' => 'integer', 'cms_site_id' => 'integer', 'cms_comm_conversation_id' => 'integer', 'cms_comm_account_id' => 'integer', 'channel' => 'string', 'direction' => 'string', 'status' => 'string', 'external_id' => 'string', 'provider_ref' => 'string', 'in_reply_to' => 'string', 'references_list' => 'text', 'from_address' => 'string', 'from_name' => 'string', 'to_list' => 'text', 'cc_list' => 'text', 'subject' => 'string', 'body_text' => 'text', 'body_html' => 'text', 'attachments' => 'text', 'is_internal' => 'integer default 0', 'is_auto' => 'integer default 0', 'is_history' => 'integer default 0', 'message_at' => 'integer', 'sent_by_user_id' => 'integer', 'error' => 'text'])->execute();
+$db->createCommand()->createTable('cms_comm_message', ['id' => 'pk', 'created_at' => 'integer', 'updated_at' => 'integer', 'cms_site_id' => 'integer', 'cms_comm_conversation_id' => 'integer', 'cms_comm_account_id' => 'integer', 'channel' => 'string', 'direction' => 'string', 'status' => 'string', 'external_id' => 'string', 'provider_ref' => 'string', 'in_reply_to' => 'string', 'references_list' => 'text', 'from_address' => 'string', 'from_name' => 'string', 'to_list' => 'text', 'cc_list' => 'text', 'subject' => 'string', 'body_text' => 'text', 'body_html' => 'text', 'attachments' => 'text', 'is_internal' => 'integer default 0', 'is_auto' => 'integer default 0', 'is_history' => 'integer default 0', 'message_at' => 'integer', 'sent_by_user_id' => 'integer', 'error' => 'text', 'cms_comm_campaign_id' => 'integer'])->execute();
 $db->createCommand()->createTable('cms_comm_link', ['id' => 'pk', 'created_at' => 'integer', 'created_by' => 'integer', 'cms_comm_message_id' => 'integer', 'model_code' => 'string', 'model_id' => 'integer', 'link_type' => 'string', 'cms_log_id' => 'integer'])->execute();
 $db->createCommand()->createTable('cms_comm_link_exclusion', ['id' => 'pk', 'created_at' => 'integer', 'created_by' => 'integer', 'cms_comm_conversation_id' => 'integer', 'model_code' => 'string', 'model_id' => 'integer'])->execute();
 // Tasks of the rule "задача при первом открытии" (stage E): core tasks and component settings.
@@ -179,3 +179,41 @@ try {
 } catch (\DomainException $e) {
     proposalExpect(CmsProposalQuestion::find()->count() == 5, 'Refused questions are not stored.');
 }
+
+// 14. Mailing campaigns of skeeks/cms-communication: templates and shared presentations, a КП of
+// each recipient from the template, what became of the sends of campaign letters, the task setting
+// of the campaign.
+$source = new \skeeks\cms\proposal\send\ProposalSendableSource();
+proposalExpect(isset($source->templates(1)[(int)$template->id]) && !isset($source->templates(2)[(int)$template->id]), 'Campaigns list the templates of the site.');
+$own = (int)$source->createFromTemplate((int)$template->id, CmsLead::findOne(20), $employee);
+$ownProposal = CmsProposal::findOne($own);
+proposalExpect($ownProposal && (int)$ownProposal->cms_lead_id === 20 && (int)$ownProposal->responsible_id === 1 && $ownProposal->name === 'Разработка сайта'
+    && $ownProposal->currentVersion && count($ownProposal->currentVersion->items) === 3, 'A КП of the recipient is made from the template with its items.');
+$states = $source->states([9001, 777]);
+proposalExpect(array_keys($states) === [9001] && (int)$states[9001]['opened_at'] === (int)$emailSend->first_viewed_at
+    && (int)$states[9001]['accepted_at'] === (int)$client->accepted_at, 'The report of a campaign reads the view and the acceptance of its letter.');
+try {
+    $source->createFromTemplate(999, CmsLead::findOne(20), $employee);
+    proposalExpect(false, 'An unknown template must be refused.');
+} catch (\skeeks\cms\communication\send\SendException $e) {
+    proposalExpect(isset($e->errors['sendable']), 'The refusal of a template is the reason of the recipient.');
+}
+$db->createCommand()->createTable('cms_comm_campaign', ['id' => 'pk', 'task_on_open' => 'integer'])->execute();
+$db->createCommand()->insert('cms_comm_campaign', ['id' => 5, 'task_on_open' => 0])->execute();
+$campaignMessage = new CmsCommMessage(['cms_site_id' => 1, 'cms_comm_conversation_id' => 1, 'channel' => 'email', 'direction' => 'out', 'status' => 'sent',
+    'external_id' => 'campaign@test', 'message_at' => time() - 600, 'cms_comm_campaign_id' => 5]);
+$campaignMessage->save(false);
+$campaignContext = new SendContext('proposal', $own, 'email', 'client@example.com', $employee);
+$ownSendable = new ProposalSendable($ownProposal);
+$ownSendable->createSendLink($campaignContext);
+$ownProposal->currentVersion->updateAttributes(['pdf_storage_file_id' => 502]);
+$ownSendable->afterSend($campaignContext, $campaignMessage);
+$campaignSend = CmsProposalSend::findOne($campaignContext->ref->id);
+$campaignSend->updateAttributes(['created_at' => time() - 600]);
+$tasksBefore = (int)\skeeks\cms\proposal\models\CmsProposalTask::find()->count();
+proposalExpect($views->record($campaignSend, $chrome, '7.7.7.7') === ProposalViews::RESULT_FIRST
+    && (int)\skeeks\cms\proposal\models\CmsProposalTask::find()->count() === $tasksBefore, 'A campaign without the "opened" task gives no task.');
+$ownProposal->target_url = 'https://site.test/page?utm_source=own';
+$campaignSend->populateRelation('proposal', $ownProposal);
+proposalExpect(\skeeks\cms\proposal\services\PresentationLinks::targetUrl($campaignSend) === 'https://site.test/page?utm_source=own&utm_medium=email&utm_campaign=campaign-5',
+    'A campaign letter marks its visits with the campaign; marks set by the employee stay.');

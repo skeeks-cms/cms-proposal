@@ -148,14 +148,21 @@ class CmsProposalSend extends \skeeks\cms\base\ActiveRecord
     }
 
     /**
-     * The personal page of this sending as an absolute URL: the host of the
-     * web request, otherwise the address of the site (API, bots, jobs).
+     * The personal page of this sending as an absolute URL `…/~kp/<code>`
+     * (the rule of config/web.php, built by hand: a console application has
+     * no web rules): the host of the web request, otherwise the address of
+     * the site for links of jobs, API and bots (skeeks/cms-communication
+     * CommunicationComponent::siteUrl(), a stand sets its own).
      */
     public function getUrl(): string
     {
-        $path = \Yii::$app->urlManager->createUrl(['/cmsProposal/proposal/view', 'code' => (string)$this->code]);
+        $path = '/~kp/'.(string)$this->code;
         if (\Yii::$app->request instanceof \yii\web\Request) {
             return \Yii::$app->request->hostInfo.$path;
+        }
+        $siteId = $this->proposal ? (int)$this->proposal->cms_site_id : null;
+        if (\Yii::$app->has('communication') && method_exists(\Yii::$app->communication, 'siteUrl')) {
+            return \Yii::$app->communication->siteUrl($siteId).$path;
         }
         $site = $this->proposal ? $this->proposal->cmsSite : null;
 

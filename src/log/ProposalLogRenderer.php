@@ -8,6 +8,7 @@
 namespace skeeks\cms\proposal\log;
 
 use skeeks\cms\backend\widgets\BackendEntityLink;
+use skeeks\cms\communication\services\AiMark;
 use skeeks\cms\communication\services\LinkChecks;
 use skeeks\cms\log\CmsLogRendererInterface;
 use skeeks\cms\models\CmsLog;
@@ -53,6 +54,14 @@ class ProposalLogRenderer implements CmsLogRendererInterface
         }
         $recipient = (string)ArrayHelper::getValue($data, 'recipient', '');
         $note = '';
+        // "Подготовлено ИИ": the letter of the send was written by AI and sent by an employee.
+        $ai = (array)ArrayHelper::getValue($data, 'ai', []);
+        $aiBadge = '';
+        if ($ai && class_exists(AiMark::class)) {
+            $mark = ['by' => AiMark::BY_AI, 'client' => (string)($ai['client'] ?? ''), 'user_id' => $ai['user_id'] ?? null, 'at' => 0, 'edited' => !empty($ai['edited'])];
+            $aiBadge = ' '.AiMark::badge($mark, isset($ai['sent_by']) ? (int)$ai['sent_by'] : null, 'Подготовлено ИИ');
+            $note .= Html::tag('div', Html::encode(AiMark::text($mark, isset($ai['sent_by']) ? (int)$ai['sent_by'] : null)), ['class' => 'sx-gray']);
+        }
         if ($event === ProposalFeed::EVENT_CHECKED) {
             $note = Html::tag('div', Html::encode('Ссылку открыла, похоже, почтовая служба или защитная система ('
                 .LinkChecks::reasonName((string)ArrayHelper::getValue($data, 'reason')).'). Это не засчитано как открытие клиентом.'), ['class' => 'sx-gray']);
@@ -61,7 +70,7 @@ class ProposalLogRenderer implements CmsLogRendererInterface
         if (!$proposal) {
             $what = $isPresentation ? 'Презентация' : 'КП';
             return Html::tag('div',
-                Html::tag('div', Html::encode($title), ['class' => 'h5'])
+                Html::tag('div', Html::encode($title).$aiBadge, ['class' => 'h5'])
                 .Html::tag('div', CmsProposal::find()->andWhere(['id' => $id])->exists()
                     ? ($isPresentation ? 'Презентация, к которой у вас нет доступа.' : 'КП, к которому у вас нет доступа.')
                     : $what.($isPresentation ? ' удалена.' : ' удалено.'), ['class' => 'sx-gray'])
@@ -75,7 +84,7 @@ class ProposalLogRenderer implements CmsLogRendererInterface
         ]);
 
         return Html::tag('div',
-            Html::tag('div', Html::encode($title), ['class' => 'h5'])
+            Html::tag('div', Html::encode($title).$aiBadge, ['class' => 'h5'])
             .Html::tag('div', BackendEntityLink::widget([
                 'controllerId' => '/cmsProposal/admin-cms-proposal',
                 'modelId'      => (int)$proposal->id,

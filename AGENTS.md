@@ -30,6 +30,13 @@ kinds) runs `services\ProposalTasks` (the call task rule, switched off by
 skeeks/cms-communication `services\LinkChecks` and never give status,
 notification or task.
 
+Mailing campaigns of skeeks/cms-communication use proposals through
+`send\ProposalSendableSource` (`send\CampaignSourceInterface`): a shared
+presentation for all recipients or a КП of each recipient made from a
+template when its letter leaves (in that transaction, so a failed letter
+leaves no КП). The "opened" task of a campaign letter follows the campaign
+setting (`Campaigns::taskOnOpen()`), not `ProposalSettings`.
+
 Visibility is `CmsProposalQuery::forManager()`: it reads `Yii::$app->user`
 for the current employee; pass the employee explicitly in jobs.
 

@@ -94,6 +94,10 @@ $dt = static fn($time) => $time ? \Yii::$app->formatter->asDatetime((int)$time, 
 
         <?php
         $sends = $model->getSends()->andWhere(['not', ['cms_comm_message_id' => null]])->with(['createdBy', 'version', 'lead', 'company', 'deal', 'cmsUser'])->all();
+        // "Подготовлено ИИ" of a send is the mark of its letter.
+        $aiLetters = $sends && class_exists(\skeeks\cms\communication\services\AiMark::class)
+            ? \skeeks\cms\communication\models\CmsCommMessage::find()->andWhere(['id' => array_map(static fn($s) => (int)$s->cms_comm_message_id, $sends),
+                'prepared_by' => \skeeks\cms\communication\services\AiMark::BY_AI])->indexBy('id')->all() : [];
         BackendSurfaceWidget::begin([
             'title' => 'Отправки',
             'titleTag' => 'h2',
@@ -111,6 +115,9 @@ $dt = static fn($time) => $time ? \Yii::$app->formatter->asDatetime((int)$time, 
                                     <span class="sx-proposal-send__channel"><?= Html::encode($send->channelName); ?></span>
                                     <?= Html::encode($send->recipientText); ?>
                                     <?php if ((int)$model->accepted_send_id === (int)$send->id) : ?><span class="sx-proposal-version__mark">принято по этой ссылке</span><?php endif; ?>
+                                    <?php if ($aiLetter = $aiLetters[(int)$send->cms_comm_message_id] ?? null) : ?>
+                                        <?= \skeeks\cms\communication\services\AiMark::badge(\skeeks\cms\communication\services\AiMark::of($aiLetter), (int)$aiLetter->sent_by_user_id, 'Подготовлено ИИ'); ?>
+                                    <?php endif; ?>
                                 </div>
                                 <?php if ($model->isShared && ($sendClient = $send->client)) : ?>
                                     <div class="sx-proposal-version__meta"><?= AdminCmsProposalController::recordLink($sendClient, $send->clientName); ?></div>

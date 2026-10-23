@@ -116,6 +116,13 @@ class ProposalSends
             'send' => (int)$send->id,
             'recipient' => $send->recipientText,
             'version' => $version ? (int)$version->version : null,
+            // "Подготовлено ИИ": the letter carrying the send was written by AI (client, for whom), sent by an employee.
+            'ai' => property_exists($context, 'aiMark') && $context->aiMark ? [
+                'client' => (string)$context->aiMark['client'],
+                'user_id' => $context->aiMark['user_id'],
+                'edited' => (bool)$context->aiMark['edited'],
+                'sent_by' => (int)$context->user->id,
+            ] : null,
         ], static fn($value) => $value !== null), $send);
     }
 
