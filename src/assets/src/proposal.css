@@ -1,0 +1,359 @@
+/* Proposal card and content window (the "КП" block of CRM cards uses the core sx-contact-* blocks). Colors only from --sx-* tokens. */
+.sx-proposal-muted,
+.sx-proposal-empty {
+    margin: 0;
+    color: var(--sx-color-text-muted);
+}
+
+.sx-proposal-empty {
+    padding: 16px;
+    border: 1px dashed var(--sx-color-border);
+    border-radius: var(--sx-radius-panel, 10px);
+    text-align: center;
+}
+
+.sx-proposal-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.sx-proposal-text {
+    margin-bottom: 16px;
+    line-height: 1.55;
+    overflow-wrap: anywhere;
+}
+
+.sx-proposal-text img {
+    max-width: 100%;
+    height: auto;
+}
+
+.sx-proposal-text > :last-child {
+    margin-bottom: 0;
+}
+
+.sx-proposal-subtitle {
+    margin: 20px 0 8px;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.sx-proposal-table-wrap {
+    overflow-x: auto;
+    border: 1px solid var(--sx-color-border);
+    border-radius: var(--sx-radius-panel, 10px);
+}
+
+.sx-proposal-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.sx-proposal-table th,
+.sx-proposal-table td {
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--sx-color-border);
+    vertical-align: top;
+    text-align: left;
+}
+
+.sx-proposal-table th {
+    background: var(--sx-color-surface-muted);
+    color: var(--sx-color-text-muted);
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.sx-proposal-table tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.sx-proposal-table__num {
+    text-align: right !important;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
+.sx-proposal-table__n {
+    width: 36px;
+    color: var(--sx-color-text-muted);
+}
+
+.sx-proposal-table__section td {
+    background: var(--sx-color-surface-muted);
+    font-weight: 600;
+}
+
+.sx-proposal-table__description {
+    margin-top: 2px;
+    color: var(--sx-color-text-muted);
+    font-size: 13px;
+}
+
+.sx-proposal-totals {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+    margin: 12px 0 0;
+}
+
+.sx-proposal-totals > div {
+    display: flex;
+    justify-content: space-between;
+    gap: 24px;
+    min-width: 240px;
+    color: var(--sx-color-text-muted);
+    font-variant-numeric: tabular-nums;
+}
+
+.sx-proposal-totals .sx-proposal-totals__main {
+    color: var(--sx-color-text);
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.sx-proposal-requisites {
+    margin-top: 20px;
+    padding-top: 12px;
+    border-top: 1px solid var(--sx-color-border);
+    color: var(--sx-color-text-muted);
+    font-size: 13px;
+}
+
+.sx-proposal-facts {
+    display: grid;
+    grid-template-columns: minmax(96px, auto) 1fr;
+    gap: 8px 12px;
+    margin: 0;
+}
+
+.sx-proposal-facts dt {
+    color: var(--sx-color-text-muted);
+    font-weight: 400;
+}
+
+.sx-proposal-facts dd {
+    margin: 0;
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+.sx-proposal-versions {
+    display: flex;
+    flex-direction: column;
+}
+
+.sx-proposal-version {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 8px 0;
+}
+
+.sx-proposal-version + .sx-proposal-version {
+    border-top: 1px solid var(--sx-color-border);
+}
+
+.sx-proposal-version__body {
+    min-width: 0;
+}
+
+.sx-proposal-version__title {
+    font-weight: 600;
+    overflow-wrap: anywhere;
+}
+
+.sx-proposal-version__mark {
+    margin-left: 6px;
+    padding: 1px 8px;
+    border-radius: 999px;
+    background: var(--sx-color-accent-soft);
+    color: var(--sx-color-accent);
+    font-size: 11px;
+    font-weight: 400;
+}
+
+.sx-proposal-version__meta {
+    color: var(--sx-color-text-muted);
+    font-size: 12px;
+}
+
+.sx-proposal-note {
+    margin-bottom: 16px;
+    padding: 10px 14px;
+    border-radius: var(--sx-radius-panel, 10px);
+    background: var(--sx-color-surface-muted);
+    color: var(--sx-color-text-muted);
+    font-size: 13px;
+}
+
+.sx-proposal-note--warning {
+    background: var(--sx-color-warning-soft);
+    color: var(--sx-color-warning-on-soft, var(--sx-color-text));
+}
+
+@media (max-width: 600px) {
+    .sx-proposal-totals > div {
+        min-width: 0;
+        width: 100%;
+    }
+}
+
+/* Sendings, views and questions of the card (stage C). */
+.sx-proposal-send__channel {
+    display: inline-block;
+    margin-right: 6px;
+    padding: 1px 8px;
+    border-radius: 999px;
+    background: var(--sx-color-surface-muted, rgba(127, 127, 127, .12));
+    color: var(--sx-color-text);
+    font-size: 12px;
+    font-weight: 600;
+    vertical-align: 1px;
+}
+
+.sx-proposal-send__title-text,
+.sx-proposal-version__title {
+    overflow-wrap: anywhere;
+}
+
+.sx-proposal-send__opened {
+    color: var(--sx-color-success, #12805c);
+}
+
+.sx-proposal-views {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.sx-proposal-view {
+    display: grid;
+    grid-template-columns: 112px minmax(0, 1fr);
+    gap: 10px;
+    font-size: 13px;
+}
+
+.sx-proposal-view__time {
+    color: var(--sx-color-text-muted);
+    white-space: nowrap;
+}
+
+.sx-proposal-view__body {
+    overflow-wrap: anywhere;
+}
+
+.sx-proposal-view.is-bot {
+    opacity: .6;
+}
+
+.sx-proposal-question__text {
+    white-space: normal;
+    overflow-wrap: anywhere;
+    margin-bottom: 4px;
+}
+
+/* "Отправить презентацию" of a CRM card: the ready presentations for everybody. */
+.sx-proposal-pick {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    max-width: 720px;
+    padding: 16px;
+}
+
+.sx-proposal-pick__title {
+    margin: 0 0 4px;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.sx-proposal-pick__list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.sx-proposal-pick__item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 14px;
+    border: 1px solid var(--sx-color-border);
+    border-radius: var(--sx-radius-panel, 10px);
+    background: var(--sx-color-surface-raised, var(--sx-color-surface));
+    color: var(--sx-color-text);
+    text-decoration: none !important;
+    transition: border-color .15s ease, background-color .15s ease;
+}
+
+.sx-proposal-pick__item:hover,
+.sx-proposal-pick__item:focus-visible {
+    border-color: var(--sx-color-accent-border, var(--sx-color-accent));
+    background: var(--sx-color-surface-hover);
+    color: var(--sx-color-text);
+}
+
+.sx-proposal-pick__item[hidden] {
+    display: none;
+}
+
+.sx-proposal-pick__body {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.sx-proposal-pick__name {
+    font-weight: 600;
+}
+
+.sx-proposal-pick__path {
+    color: var(--sx-color-text-muted);
+    font-size: 13px;
+    overflow-wrap: anywhere;
+}
+
+.sx-proposal-pick__item .sx-status {
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+.sx-proposal-pick__empty-text {
+    margin: 0 0 12px;
+}
+
+.sx-proposal-pick__foot {
+    font-size: 13px;
+}
+
+@media (max-width: 480px) {
+    .sx-proposal-pick {
+        padding: 12px;
+    }
+
+    .sx-proposal-pick__item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
+/* The content window of a КП: the next step after the items. */
+.sx-proposal-next-step {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 8px;
+    padding: 14px 16px;
+    border: 1px solid var(--sx-color-accent-border, var(--sx-color-border));
+    border-radius: var(--sx-radius-panel, 10px);
+    background: var(--sx-color-accent-soft, var(--sx-color-surface-muted));
+}

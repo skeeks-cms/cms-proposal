@@ -1,0 +1,421 @@
+/* Items editor of proposals (ProposalItemsInputWidget). Colors only from --sx-* tokens. */
+.sx-proposal-items {
+    --sx-pi-columns: 22px minmax(180px, 1fr) 72px 64px 104px 96px 112px 64px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.sx-proposal-items__table {
+    border: 1px solid var(--sx-color-border);
+    border-radius: var(--sx-radius-panel, 10px);
+    background: var(--sx-color-surface);
+    overflow: hidden;
+}
+
+.sx-proposal-items__head,
+.sx-proposal-items__row {
+    display: grid;
+    grid-template-columns: var(--sx-pi-columns);
+    gap: 8px;
+    align-items: start;
+    padding: 8px 10px;
+}
+
+.sx-proposal-items__head {
+    padding-top: 10px;
+    padding-bottom: 10px;
+    background: var(--sx-color-surface-muted);
+    border-bottom: 1px solid var(--sx-color-border);
+    color: var(--sx-color-text-muted);
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.sx-proposal-items__row + .sx-proposal-items__row {
+    border-top: 1px solid var(--sx-color-border);
+}
+
+.sx-proposal-items__row--section {
+    background: var(--sx-color-surface-muted);
+}
+
+.sx-proposal-items__row--section .sx-proposal-items__cell--name {
+    grid-column: 2 / 7;
+}
+
+.sx-proposal-items__row--ghost {
+    opacity: .45;
+    background: var(--sx-color-accent-soft);
+}
+
+.sx-proposal-items__cell--handle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 34px;
+    color: var(--sx-color-text-subtle, var(--sx-color-text-muted));
+    cursor: grab;
+    touch-action: none;
+}
+
+.sx-proposal-items__head .sx-proposal-items__cell--handle {
+    height: auto;
+    cursor: default;
+}
+
+.sx-proposal-items__cell--name {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+}
+
+.sx-proposal-items__cell--amount {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    min-height: 34px;
+    font-weight: 600;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
+.sx-proposal-items__head .sx-proposal-items__cell--amount {
+    min-height: 0;
+}
+
+.sx-proposal-items__head .sx-proposal-items__cell--qty,
+.sx-proposal-items__head .sx-proposal-items__cell--price,
+.sx-proposal-items__head .sx-proposal-items__cell--discount {
+    text-align: right;
+}
+
+.sx-proposal-items__cell--actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 2px;
+    min-height: 34px;
+}
+
+.sx-proposal-items__label {
+    display: none;
+}
+
+.sx-proposal-items__input {
+    width: 100%;
+    min-width: 0;
+    height: 34px;
+    padding: 6px 8px;
+    border: 1px solid var(--sx-form-control-border-color, var(--sx-color-border));
+    border-radius: var(--sx-form-control-radius, var(--sx-radius-control, 6px));
+    background: var(--sx-form-control-background, var(--sx-color-surface));
+    color: var(--sx-form-control-color, var(--sx-color-text));
+    font: inherit;
+    font-size: 14px;
+    transition: border-color .15s ease, box-shadow .15s ease;
+}
+
+.sx-proposal-items__input::placeholder {
+    color: var(--sx-form-control-placeholder-color, var(--sx-color-text-muted));
+}
+
+.sx-proposal-items__input:hover {
+    border-color: var(--sx-form-control-hover-border-color, var(--sx-color-border-strong));
+}
+
+.sx-proposal-items__input:focus {
+    outline: none;
+    border-color: var(--sx-form-control-focus-border-color, var(--sx-color-accent));
+    box-shadow: var(--sx-form-control-focus-shadow, 0 0 0 3px var(--sx-color-focus-ring));
+}
+
+.sx-proposal-items__num {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+textarea.sx-proposal-items__input {
+    height: auto;
+    min-height: 54px;
+    resize: vertical;
+}
+
+.sx-proposal-items__section-name {
+    font-weight: 600;
+}
+
+.sx-proposal-items__more {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.sx-proposal-items__more[hidden] {
+    display: none;
+}
+
+.sx-proposal-items__vat {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    color: var(--sx-color-text-muted);
+    font-size: 12px;
+    font-weight: 400;
+}
+
+.sx-proposal-items__vat .sx-proposal-items__input {
+    max-width: 160px;
+    height: 30px;
+}
+
+.sx-proposal-items__badge {
+    align-self: flex-start;
+    padding: 1px 8px;
+    border-radius: 999px;
+    background: var(--sx-color-info-soft);
+    color: var(--sx-color-info);
+    font-size: 11px;
+}
+
+.sx-proposal-items__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border: 0;
+    border-radius: var(--sx-radius-sm, 6px);
+    background: transparent;
+    color: var(--sx-color-text-muted);
+    cursor: pointer;
+}
+
+.sx-proposal-items__icon:hover,
+.sx-proposal-items__icon:focus-visible {
+    background: var(--sx-color-surface-hover);
+    color: var(--sx-color-text);
+    outline: none;
+}
+
+.sx-proposal-items__icon--danger:hover,
+.sx-proposal-items__icon--danger:focus-visible {
+    background: var(--sx-color-danger-soft);
+    color: var(--sx-color-danger);
+}
+
+.sx-proposal-items__empty {
+    padding: 18px 14px;
+    color: var(--sx-color-text-muted);
+    text-align: center;
+}
+
+.sx-proposal-items__empty[hidden] {
+    display: none;
+}
+
+.sx-proposal-items__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+}
+
+.sx-proposal-items__search-wrap {
+    position: relative;
+    flex: 1 1 260px;
+    max-width: 420px;
+}
+
+.sx-proposal-items__search {
+    width: 100%;
+    height: var(--sx-button-height-sm, 32px);
+    padding: 4px 10px;
+    border: 1px solid var(--sx-form-control-border-color, var(--sx-color-border));
+    border-radius: var(--sx-form-control-radius, var(--sx-radius-control, 6px));
+    background: var(--sx-form-control-background, var(--sx-color-surface));
+    color: var(--sx-form-control-color, var(--sx-color-text));
+    font: inherit;
+    font-size: 14px;
+}
+
+.sx-proposal-items__search:focus {
+    outline: none;
+    border-color: var(--sx-form-control-focus-border-color, var(--sx-color-accent));
+    box-shadow: var(--sx-form-control-focus-shadow, 0 0 0 3px var(--sx-color-focus-ring));
+}
+
+.sx-proposal-items__suggest {
+    position: absolute;
+    z-index: 30;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    max-height: 320px;
+    overflow: auto;
+    border: 1px solid var(--sx-color-border);
+    border-radius: var(--sx-radius-panel, 10px);
+    background: var(--sx-color-surface-raised, var(--sx-color-surface));
+    box-shadow: 0 12px 32px rgba(0, 0, 0, .18);
+}
+
+.sx-proposal-items__suggest[hidden] {
+    display: none;
+}
+
+.sx-proposal-items__suggest-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 8px 10px;
+    border: 0;
+    background: transparent;
+    color: var(--sx-color-text);
+    text-align: left;
+    cursor: pointer;
+}
+
+.sx-proposal-items__suggest-item.is-active,
+.sx-proposal-items__suggest-item:hover {
+    background: var(--sx-color-surface-hover);
+}
+
+.sx-proposal-items__suggest-item img,
+.sx-proposal-items__suggest-noimg {
+    flex: 0 0 32px;
+    width: 32px;
+    height: 32px;
+    border-radius: var(--sx-radius-sm, 6px);
+    object-fit: cover;
+    background: var(--sx-color-surface-muted);
+}
+
+.sx-proposal-items__suggest-body {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.sx-proposal-items__suggest-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.sx-proposal-items__suggest-meta,
+.sx-proposal-items__suggest-empty {
+    color: var(--sx-color-text-muted);
+    font-size: 12px;
+}
+
+.sx-proposal-items__suggest-empty {
+    padding: 10px;
+}
+
+.sx-proposal-items__suggest-price {
+    white-space: nowrap;
+    font-weight: 600;
+}
+
+.sx-proposal-items__totals {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+}
+
+.sx-proposal-items__total-line {
+    display: flex;
+    gap: 24px;
+    justify-content: space-between;
+    min-width: 260px;
+    color: var(--sx-color-text-muted);
+    font-variant-numeric: tabular-nums;
+}
+
+.sx-proposal-items__total-line--main {
+    color: var(--sx-color-text);
+    font-size: 18px;
+    font-weight: 700;
+}
+
+/* Narrow windows and phones: a line becomes a small card. */
+@media (max-width: 860px) {
+    .sx-proposal-items__head {
+        display: none;
+    }
+
+    .sx-proposal-items__row {
+        grid-template-columns: 22px repeat(4, minmax(0, 1fr));
+        grid-template-areas:
+            "handle name name name name"
+            ". qty measure price discount"
+            ". amount amount amount actions";
+        row-gap: 8px;
+    }
+
+    .sx-proposal-items__row--section {
+        grid-template-areas:
+            "handle name name name actions"
+            ". amount amount amount amount";
+    }
+
+    .sx-proposal-items__cell--handle { grid-area: handle; }
+    .sx-proposal-items__cell--name { grid-area: name; }
+    .sx-proposal-items__row--section .sx-proposal-items__cell--name { grid-column: auto; }
+    .sx-proposal-items__cell--qty { grid-area: qty; }
+    .sx-proposal-items__cell--measure { grid-area: measure; }
+    .sx-proposal-items__cell--price { grid-area: price; }
+    .sx-proposal-items__cell--discount { grid-area: discount; }
+    .sx-proposal-items__cell--amount { grid-area: amount; justify-content: flex-start; }
+    .sx-proposal-items__cell--actions { grid-area: actions; }
+
+    .sx-proposal-items__cell--qty,
+    .sx-proposal-items__cell--measure,
+    .sx-proposal-items__cell--price,
+    .sx-proposal-items__cell--discount {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        margin: 0;
+        min-width: 0;
+    }
+
+    .sx-proposal-items__label {
+        display: block;
+        color: var(--sx-color-text-muted);
+        font-size: 11px;
+        font-weight: 400;
+    }
+
+    .sx-proposal-items__totals {
+        align-items: stretch;
+    }
+
+    .sx-proposal-items__total-line {
+        min-width: 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .sx-proposal-items__row {
+        grid-template-columns: 22px repeat(2, minmax(0, 1fr));
+        grid-template-areas:
+            "handle name name"
+            ". qty measure"
+            ". price discount"
+            ". amount actions";
+    }
+
+    .sx-proposal-items__row--section {
+        grid-template-columns: 22px minmax(0, 1fr) auto;
+        grid-template-areas:
+            "handle name actions"
+            ". amount amount";
+    }
+}
