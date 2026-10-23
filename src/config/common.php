@@ -23,4 +23,13 @@ return [
             'sendables' => [ProposalSendableSource::TYPE => ProposalSendableSource::class],
         ],
     ],
+
+    // Read tools of proposals for skeeks/cms-mcp (inert without it): mcp\ProposalReadToolProvider.
+    'params' => ['cmsMcp' => [
+        'toolProviders' => ['proposal' => \skeeks\cms\proposal\mcp\ProposalReadToolProvider::class],
+        'historyLogDescribers' => [CmsProposal::LOG_TYPE => \skeeks\cms\proposal\mcp\ProposalHistoryDescriber::class],
+        'overviewContributors' => ['proposals' => \skeeks\cms\proposal\mcp\ProposalOverviewContributor::class],
+        // The page of one sending is never shown to API clients: opening it would count as the client's opening.
+        'personalLinkPatterns' => ['proposal' => '~/\~kp/~'],
+    ]],
 ];
