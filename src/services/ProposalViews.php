@@ -45,27 +45,14 @@ class ProposalViews
     public const REPEAT_WINDOW = 1800;
 
     /**
-     * Robots that open links for previews and checks. Matched case-insensitively
-     * against the User-Agent; an empty User-Agent is a robot too.
+     * Robots that open links for previews and checks: the shared list of
+     * skeeks/cms-communication, also used by visits by links of letters.
      */
-    public const BOT_PATTERNS = [
-        // "Cubot" is a phone, not a robot.
-        '(?<!cu)bot\b', 'bot/', '_bot', '-bot', 'crawl', 'spider', 'slurp', 'preview', 'scanner', 'checker', 'monitor',
-        'telegram', 'whatsapp', 'viber', 'vkshare', 'skypeuripreview', 'facebookexternalhit', 'meta-externalagent',
-        'yandex(?!search|browser)', 'mail\.ru', '\bmax(?:bot|messenger)?/',
-        'kaspersky', 'drweb', 'safebrowsing', 'safelinks', 'proofpoint', 'mimecast', 'barracuda',
-        'curl', 'wget', 'httpie', 'python', 'java/', 'okhttp', 'go-http-client', 'libwww', 'axios', 'node-fetch', 'guzzle', 'php/',
-        'headlesschrome', 'phantomjs', 'puppeteer', 'playwright', 'lighthouse', 'pagespeed',
-    ];
+    public const BOT_PATTERNS = LinkChecks::ROBOT_PATTERNS;
 
     public static function isBot(?string $userAgent): bool
     {
-        $userAgent = trim((string)$userAgent);
-        if ($userAgent === '') {
-            return true;
-        }
-
-        return (bool)preg_match('~'.implode('|', self::BOT_PATTERNS).'~i', $userAgent);
+        return LinkChecks::isRobot($userAgent);
     }
 
     /**

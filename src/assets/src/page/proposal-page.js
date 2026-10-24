@@ -41,35 +41,11 @@
         });
     }
 
+    /** The shared signal of skeeks/cms-communication (link-signal.js): once the page was visible for a moment. */
     function seen(url) {
-        var sent = false;
-        var timer = null;
-
-        function arm() {
-            if (sent || timer || document.visibilityState !== 'visible') {
-                return;
-            }
-            timer = setTimeout(function () {
-                timer = null;
-                if (sent || document.visibilityState !== 'visible') {
-                    return;
-                }
-                sent = true;
-                post(url, browserSignals()).catch(function () {
-                    sent = false;
-                });
-            }, SEEN_DELAY);
-        }
-
-        document.addEventListener('visibilitychange', function () {
-            if (document.visibilityState === 'visible') {
-                arm();
-            } else if (timer) {
-                clearTimeout(timer);
-                timer = null;
-            }
+        window.sxLinkSignal.whenSeen(SEEN_DELAY, function () {
+            return post(url, browserSignals());
         });
-        arm();
     }
 
     function showError(el, text) {
@@ -187,13 +163,7 @@
 
     /** What a link check in an automated browser gives away (LinkChecks of skeeks/cms-communication). */
     function browserSignals() {
-        return {
-            webdriver: navigator.webdriver ? 1 : 0,
-            languages: navigator.languages ? navigator.languages.length : '',
-            // The screen, not the window: in-app browsers of phones report a window of zero size.
-            width: window.screen ? window.screen.width : '',
-            height: window.screen ? window.screen.height : ''
-        };
+        return window.sxLinkSignal.browserSignals();
     }
 
     /** Visible this long before a presentation counts and leads on, ms. */

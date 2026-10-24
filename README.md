@@ -78,10 +78,20 @@
 - Просмотр засчитывается запросом `POST …/seen` из скрипта страницы, когда
   она 1,5 секунды видна (`visibilityState`); `curl`, почтовые проверки и
   предпросмотр мессенджеров его не делают, а известные роботы
-  (`ProposalViews::BOT_PATTERNS`) записываются в историю без счёта.
+  (общий список `LinkChecks::ROBOT_PATTERNS` пакета `skeeks/cms-communication`,
+  `ProposalViews::BOT_PATTERNS` — тот же) записываются в историю без счёта.
 - Сигнал передаёт признаки браузера (`navigator.webdriver`, число языков,
   размер экрана): проверки ссылок в автоматическом браузере
   (`LinkChecks` пакета `skeeks/cms-communication`) не засчитываются.
+- Сигнал «страницу увидели» и признаки браузера — общий скрипт
+  `skeeks/cms-communication` (`LinkSignalAsset`, `link-signal.js`), его же
+  использует учёт переходов по ссылкам из писем; раскладка печатает его
+  перед `proposal-page.js`. Метки адреса перехода —
+  `LinkMarks::addParams()` (`PresentationLinks::addUtm()` вызывает его).
+- Письмо с предложением: другие ссылки письма на наши сайты получают
+  `utm_campaign=proposal-<номер>` (`ProposalSendable` реализует
+  `SendableMarksInterface`) и личный код письма — переходы по ним пишет
+  в ленту `cms-communication`. Личная ссылка `/~kp/…` не размечается.
 
 ## Презентация: страница-переход
 

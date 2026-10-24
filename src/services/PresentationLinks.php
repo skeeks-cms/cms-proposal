@@ -8,6 +8,7 @@
 namespace skeeks\cms\proposal\services;
 
 use skeeks\cms\communication\models\CmsCommMessage;
+use skeeks\cms\communication\services\LinkMarks;
 use skeeks\cms\proposal\models\CmsProposalSend;
 
 /**
@@ -20,7 +21,7 @@ use skeeks\cms\proposal\models\CmsProposalSend;
  */
 class PresentationLinks
 {
-    public const UTM_SOURCE = 'crm';
+    public const UTM_SOURCE = LinkMarks::UTM_SOURCE;
 
     /** "proposal-12"; the letters of a mailing campaign mark their visits "campaign-<id>". */
     public static function campaign(int $number): string
@@ -43,27 +44,13 @@ class PresentationLinks
         ]);
     }
 
-    /** Adds the marks that the address does not have yet; the fragment stays at the end. */
+    /**
+     * Adds the marks that the address does not have yet; the fragment stays
+     * at the end. The same rule as links of letters (skeeks/cms-communication
+     * LinkMarks).
+     */
     public static function addUtm(string $url, array $utm): string
     {
-        $fragment = '';
-        if (($hash = strpos($url, '#')) !== false) {
-            $fragment = substr($url, $hash);
-            $url = substr($url, 0, $hash);
-        }
-        $query = (string)parse_url($url, PHP_URL_QUERY);
-        parse_str($query, $existing);
-        $existing = array_change_key_case($existing, CASE_LOWER);
-        $add = [];
-        foreach ($utm as $key => $value) {
-            if ($value !== '' && !array_key_exists(strtolower($key), $existing)) {
-                $add[$key] = $value;
-            }
-        }
-        if ($add) {
-            $url .= (str_contains($url, '?') ? (str_ends_with($url, '?') || str_ends_with($url, '&') ? '' : '&') : '?').http_build_query($add, '', '&', PHP_QUERY_RFC3986);
-        }
-
-        return $url.$fragment;
+        return LinkMarks::addParams($url, $utm);
     }
 }

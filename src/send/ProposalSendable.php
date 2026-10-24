@@ -10,10 +10,12 @@ namespace skeeks\cms\proposal\send;
 use skeeks\cms\communication\models\CmsCommMessage;
 use skeeks\cms\communication\send\SendableHtmlInterface;
 use skeeks\cms\communication\send\SendableInterface;
+use skeeks\cms\communication\send\SendableMarksInterface;
 use skeeks\cms\communication\send\SendContext;
 use skeeks\cms\communication\send\SendFile;
 use skeeks\cms\communication\send\SendRefusalInterface;
 use skeeks\cms\proposal\models\CmsProposal;
+use skeeks\cms\proposal\services\PresentationLinks;
 use skeeks\cms\proposal\services\ProposalItems;
 use skeeks\cms\proposal\services\ProposalPdf;
 use skeeks\cms\proposal\services\ProposalSends;
@@ -25,7 +27,7 @@ use skeeks\cms\proposal\services\ProposalSends;
  * A presentation is the manager's short text and the button "Посмотреть",
  * no files.
  */
-class ProposalSendable implements SendableInterface, SendableHtmlInterface, SendRefusalInterface
+class ProposalSendable implements SendableInterface, SendableHtmlInterface, SendRefusalInterface, SendableMarksInterface
 {
     public CmsProposal $proposal;
 
@@ -81,6 +83,12 @@ class ProposalSendable implements SendableInterface, SendableHtmlInterface, Send
     public function getSendHtml(): string
     {
         return $this->proposal->isPresentation ? $this->proposal->getMessageHtml() : '';
+    }
+
+    /** Links of the letter to our sites are marked as visits of this offer: "proposal-12". */
+    public function getSendUtmCampaign(): string
+    {
+        return PresentationLinks::campaign((int)$this->proposal->number);
     }
 
     public function getSendButton(): string

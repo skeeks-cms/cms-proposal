@@ -20,7 +20,7 @@
         "php": ">=8.0",
         "skeeks/cms": "^6.4.9.64",
         "skeeks/cms-backend": "^2.1.1.20",
-        "skeeks/cms-communication": "^1.7",
+        "skeeks/cms-communication": "^1.9",
         "kartik-v/yii2-mpdf": "^1.0.6"
     },
     "conflict": {

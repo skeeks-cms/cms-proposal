@@ -37,6 +37,8 @@ $asset = static function (string $file) use ($bundle, $assets) {
 </head>
 <body class="sx-kp-body">
 <?= $content; ?>
+<?php // The shared "a person saw the page" signal of skeeks/cms-communication, then the page script. ?>
+<script src="<?= Html::encode(\skeeks\cms\communication\assets\LinkSignalAsset::scriptUrl()); ?>"></script>
 <script src="<?= Html::encode($asset('proposal-page.js')); ?>"></script>
 <?php if (!empty($this->params['kpScript'])) : ?><script><?= $this->params['kpScript']; ?></script><?php endif; ?>
 </body>
