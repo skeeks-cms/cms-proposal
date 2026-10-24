@@ -10,7 +10,8 @@ namespace skeeks\cms\proposal\log;
 use skeeks\cms\backend\widgets\BackendEntityLink;
 use skeeks\cms\communication\services\AiMark;
 use skeeks\cms\communication\services\LinkChecks;
-use skeeks\cms\log\CmsLogRendererInterface;
+use skeeks\cms\log\CmsLogEntry;
+use skeeks\cms\log\CmsLogEntryRenderer;
 use skeeks\cms\models\CmsLog;
 use skeeks\cms\proposal\models\CmsProposal;
 use skeeks\cms\proposal\models\CmsProposalSend;
@@ -26,9 +27,19 @@ use yii\helpers\Html;
  * ссылок" for an opening that looks like a mail service. The proposal is
  * named and linked only for employees who may see it.
  */
-class ProposalLogRenderer implements CmsLogRendererInterface
+class ProposalLogRenderer extends CmsLogEntryRenderer
 {
-    public function render(CmsLog $log): string
+    /** Icon and tone of each event in the shared feed entry. */
+    private const LOOK = [
+        ProposalFeed::EVENT_CREATED  => ['file-text', CmsLogEntry::TONE_NEUTRAL],
+        ProposalFeed::EVENT_VERSION  => ['file-text', CmsLogEntry::TONE_NEUTRAL],
+        ProposalFeed::EVENT_SENT     => ['send', CmsLogEntry::TONE_ACCENT],
+        ProposalFeed::EVENT_OPENED   => ['eye', CmsLogEntry::TONE_SUCCESS],
+        ProposalFeed::EVENT_ACCEPTED => ['check-circle', CmsLogEntry::TONE_SUCCESS],
+        ProposalFeed::EVENT_CHECKED  => ['shield', CmsLogEntry::TONE_NEUTRAL],
+    ];
+
+    public function entry(CmsLog $log): CmsLogEntry
     {
         $data = (array)$log->data;
         $event = (string)ArrayHelper::getValue($data, 'event', ProposalFeed::EVENT_CREATED);
@@ -52,49 +63,47 @@ class ProposalLogRenderer implements CmsLogRendererInterface
             && ($channel = (string)ArrayHelper::getValue($data, 'channel'))) {
             $title .= ' ('.mb_strtolower(CmsProposalSend::channels()[$channel] ?? $channel).')';
         }
-        $recipient = (string)ArrayHelper::getValue($data, 'recipient', '');
-        $note = '';
-        // "Подготовлено ИИ": the letter of the send was written by AI and sent by an employee.
+        [$icon, $tone] = self::LOOK[$event] ?? ['file-text', CmsLogEntry::TONE_NEUTRAL];
+        $entry = new CmsLogEntry(['icon' => $icon, 'tone' => $tone, 'title' => $title]);
+
+        // "Подготовлено ИИ": the letter of the send was written by AI; the AI client and the employees are in the tooltip.
         $ai = (array)ArrayHelper::getValue($data, 'ai', []);
-        $aiBadge = '';
         if ($ai && class_exists(AiMark::class)) {
             $mark = ['by' => AiMark::BY_AI, 'client' => (string)($ai['client'] ?? ''), 'user_id' => $ai['user_id'] ?? null, 'at' => 0, 'edited' => !empty($ai['edited']),
                 'sent_via' => $ai['sent_via'] ?? null];
-            $aiBadge = ' '.AiMark::badge($mark, isset($ai['sent_by']) ? (int)$ai['sent_by'] : null, 'Подготовлено ИИ');
-            $note .= Html::tag('div', Html::encode(AiMark::text($mark, isset($ai['sent_by']) ? (int)$ai['sent_by'] : null)), ['class' => 'sx-gray']);
-        }
-        if ($event === ProposalFeed::EVENT_CHECKED) {
-            $note = Html::tag('div', Html::encode('Ссылку открыла, похоже, почтовая служба или защитная система ('
-                .LinkChecks::reasonName((string)ArrayHelper::getValue($data, 'reason')).'). Это не засчитано как открытие клиентом.'), ['class' => 'sx-gray']);
+            $entry->badges[] = CmsLogEntry::badge('Подготовлено ИИ', AiMark::text($mark, isset($ai['sent_by']) ? (int)$ai['sent_by'] : null));
         }
 
         if (!$proposal) {
             $what = $isPresentation ? 'Презентация' : 'КП';
-            return Html::tag('div',
-                Html::tag('div', Html::encode($title).$aiBadge, ['class' => 'h5'])
-                .Html::tag('div', CmsProposal::find()->andWhere(['id' => $id])->exists()
-                    ? ($isPresentation ? 'Презентация, к которой у вас нет доступа.' : 'КП, к которому у вас нет доступа.')
-                    : $what.($isPresentation ? ' удалена.' : ' удалено.'), ['class' => 'sx-gray'])
-            );
+            $entry->details[] = CmsProposal::find()->andWhere(['id' => $id])->exists()
+                ? ($isPresentation ? 'Презентация, к которой у вас нет доступа.' : 'КП, к которому у вас нет доступа.')
+                : $what.($isPresentation ? ' удалена.' : ' удалено.');
+
+            return $entry;
         }
 
         $version = $isPresentation ? null : $proposal->currentVersion;
-        $details = array_filter([
+        $facts = array_filter([
             $version ? ProposalItems::money($version->amount, (string)$version->currency_code) : '',
             $proposal->displayStatusName,
         ]);
-
-        return Html::tag('div',
-            Html::tag('div', Html::encode($title).$aiBadge, ['class' => 'h5'])
-            .Html::tag('div', BackendEntityLink::widget([
+        $entry->summary = BackendEntityLink::widget([
                 'controllerId' => '/cmsProposal/admin-cms-proposal',
                 'modelId'      => (int)$proposal->id,
                 'label'        => $proposal->asText,
-                'options'      => ['style' => 'font-weight:600'],
-            ]).($details ? ' <span class="sx-gray">· '.Html::encode(implode(' · ', $details)).'</span>' : ''))
-            .($recipient !== '' ? Html::tag('div', Html::encode(($event === ProposalFeed::EVENT_SENT ? 'Кому: ' : 'Ссылка отправлена: ').$recipient), ['class' => 'sx-gray']) : '')
-            .$note,
-            ['class' => 'sx-proposal-log']
-        );
+            ])
+            .($facts ? ' '.Html::tag('span', '· '.Html::encode(implode(' · ', $facts)), ['class' => 'sx-gray']) : '');
+
+        $recipient = (string)ArrayHelper::getValue($data, 'recipient', '');
+        if ($recipient !== '') {
+            $entry->details[] = Html::encode(($event === ProposalFeed::EVENT_SENT ? 'Кому: ' : 'Ссылка отправлена: ').$recipient);
+        }
+        if ($event === ProposalFeed::EVENT_CHECKED) {
+            $entry->details[] = Html::encode('Ссылку открыла, похоже, почтовая служба или защитная система ('
+                .LinkChecks::reasonName((string)ArrayHelper::getValue($data, 'reason')).'). Это не засчитано как открытие клиентом.');
+        }
+
+        return $entry;
     }
 }
