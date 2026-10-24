@@ -58,7 +58,8 @@ class ProposalLogRenderer implements CmsLogRendererInterface
         $ai = (array)ArrayHelper::getValue($data, 'ai', []);
         $aiBadge = '';
         if ($ai && class_exists(AiMark::class)) {
-            $mark = ['by' => AiMark::BY_AI, 'client' => (string)($ai['client'] ?? ''), 'user_id' => $ai['user_id'] ?? null, 'at' => 0, 'edited' => !empty($ai['edited'])];
+            $mark = ['by' => AiMark::BY_AI, 'client' => (string)($ai['client'] ?? ''), 'user_id' => $ai['user_id'] ?? null, 'at' => 0, 'edited' => !empty($ai['edited']),
+                'sent_via' => $ai['sent_via'] ?? null];
             $aiBadge = ' '.AiMark::badge($mark, isset($ai['sent_by']) ? (int)$ai['sent_by'] : null, 'Подготовлено ИИ');
             $note .= Html::tag('div', Html::encode(AiMark::text($mark, isset($ai['sent_by']) ? (int)$ai['sent_by'] : null)), ['class' => 'sx-gray']);
         }

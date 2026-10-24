@@ -12,6 +12,7 @@ use skeeks\cms\communication\send\SendableHtmlInterface;
 use skeeks\cms\communication\send\SendableInterface;
 use skeeks\cms\communication\send\SendContext;
 use skeeks\cms\communication\send\SendFile;
+use skeeks\cms\communication\send\SendRefusalInterface;
 use skeeks\cms\proposal\models\CmsProposal;
 use skeeks\cms\proposal\services\ProposalItems;
 use skeeks\cms\proposal\services\ProposalPdf;
@@ -24,13 +25,19 @@ use skeeks\cms\proposal\services\ProposalSends;
  * A presentation is the manager's short text and the button "Посмотреть",
  * no files.
  */
-class ProposalSendable implements SendableInterface, SendableHtmlInterface
+class ProposalSendable implements SendableInterface, SendableHtmlInterface, SendRefusalInterface
 {
     public CmsProposal $proposal;
 
     public function __construct(CmsProposal $proposal)
     {
         $this->proposal = $proposal;
+    }
+
+    /** Why it cannot be sent now (expired, empty, no page): asked by checks before a letter is made. */
+    public function getSendRefusal(): ?string
+    {
+        return ProposalSends::refusal($this->proposal);
     }
 
     public function getSendTitle(): string

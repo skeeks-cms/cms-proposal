@@ -179,11 +179,21 @@ class ProposalSendableSource implements SendableSourceInterface, CampaignSourceI
             return [];
         }
         $result = [];
-        foreach (CmsProposalSend::find()->andWhere(['cms_comm_message_id' => $messageIds])->with('proposal')->all() as $send) {
+        $sends = CmsProposalSend::find()->andWhere(['cms_comm_message_id' => $messageIds])->with('proposal')->all();
+        $checks = $sends ? \skeeks\cms\proposal\models\CmsProposalView::find()->select(['n' => 'COUNT(*)', 'cms_proposal_send_id'])
+            ->andWhere(['cms_proposal_send_id' => array_map(static fn($s) => (int)$s->id, $sends)])->andWhere(['not', ['check_reason' => null]])
+            ->groupBy('cms_proposal_send_id')->indexBy('cms_proposal_send_id')->column() : [];
+        foreach ($sends as $send) {
             $proposal = $send->proposal;
             $result[(int)$send->cms_comm_message_id] = [
                 'opened_at' => $send->first_viewed_at ? (int)$send->first_viewed_at : null,
                 'accepted_at' => $proposal && (int)$proposal->accepted_send_id === (int)$send->id && $proposal->accepted_at ? (int)$proposal->accepted_at : null,
+                // The send itself, for API status: its id and honest views; link checks of mail services are counted apart.
+                'send_id' => (int)$send->id,
+                'proposal_id' => (int)$send->cms_proposal_id,
+                'last_viewed_at' => $send->last_viewed_at ? (int)$send->last_viewed_at : null,
+                'views_count' => (int)$send->views_count,
+                'link_checks_count' => (int)($checks[(int)$send->id] ?? 0),
             ];
         }
 
