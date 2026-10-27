@@ -105,7 +105,7 @@ class AdminCmsProposalController extends BackendModelStandartController
                 ],
                 'emptyState' => [
                     'title' => 'Предложений пока нет',
-                    'description' => 'Создайте КП или презентацию здесь или из карточки лида, компании или сделки.',
+                    'description' => 'Создайте КП или презентацию здесь или из карточки сделки, компании или услуги.',
                     'icon' => 'far fa-file-alt',
                     'action' => ['backendAction' => 'create', 'label' => 'Создать предложение'],
                 ],

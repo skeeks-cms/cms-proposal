@@ -289,9 +289,9 @@ JS
                 $note[] = (string)parse_url((string)$proposal->target_url, PHP_URL_PATH) ?: AdminCmsProposalController::targetText($proposal);
             }
             if (!$record instanceof \skeeks\cms\models\CmsLead && $proposal->cms_lead_id) {
-                $note[] = 'лид';
-            } elseif (!$record instanceof \skeeks\cms\models\CmsDeal && $proposal->cms_deal_id) {
                 $note[] = 'сделка';
+            } elseif (!$record instanceof \skeeks\cms\models\CmsDeal && $proposal->cms_deal_id) {
+                $note[] = 'услуга';
             }
             $body = Html::tag('span', Html::encode($proposal->numberText.' · '.\Yii::$app->formatter->asDate((int)$proposal->created_at, 'php:d.m.Y')), ['class' => 'sx-contact-label'])
                 .Html::tag('span', BackendEntityLink::widget([

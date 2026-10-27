@@ -172,7 +172,7 @@ class ProposalTasks
         }
         $deal = $send->deal ?: $proposal->deal;
         if ($deal) {
-            $lines[] = 'Сделка: '.$deal->asText;
+            $lines[] = 'Услуга: '.$deal->asText;
         }
         $lead = $send->lead ?: $proposal->lead;
         if ($lead && ($phone = $lead->mainPhone)) {

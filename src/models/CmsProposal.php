@@ -294,9 +294,9 @@ class CmsProposal extends \skeeks\cms\base\ActiveRecord
             return;
         }
         if (!$filled) {
-            $this->addError($attribute, 'Выберите клиента: лид, компанию, сделку или клиента-человека.');
+            $this->addError($attribute, 'Выберите клиента: сделку, компанию, услугу или клиента-человека.');
         } elseif (count($filled) > 1) {
-            $this->addError($attribute, 'Выберите одного клиента: лид, компанию, сделку или клиента-человека.');
+            $this->addError($attribute, 'Выберите одного клиента: сделку, компанию, услугу или клиента-человека.');
         }
     }
 
@@ -313,9 +313,9 @@ class CmsProposal extends \skeeks\cms\base\ActiveRecord
             'message'                  => 'Текст для клиента',
             'number'                   => 'Номер',
             'name'                     => 'Название',
-            'cms_lead_id'              => 'Лид',
+            'cms_lead_id'              => 'Сделка',
             'cms_company_id'           => 'Компания',
-            'cms_deal_id'              => 'Сделка',
+            'cms_deal_id'              => 'Услуга',
             'cms_user_id'              => 'Клиент',
             'responsible_id'           => 'Ответственный',
             'status'                   => 'Статус',
@@ -499,13 +499,13 @@ class CmsProposal extends \skeeks\cms\base\ActiveRecord
             return 'Клиент';
         }
         if ($this->cms_lead_id) {
-            return 'Лид';
+            return 'Сделка';
         }
         if ($this->cms_user_id) {
             return 'Клиент';
         }
 
-        return $this->cms_deal_id ? 'Сделка' : 'Компания';
+        return $this->cms_deal_id ? 'Услуга' : 'Компания';
     }
 
     public function getClientName(): string

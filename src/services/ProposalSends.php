@@ -47,7 +47,7 @@ class ProposalSends
         // The client of the sending: the proposal's, or for a presentation for
         // everybody the CRM record of the recipient (or of the card it is sent from).
         if (!$send->setClient($proposal->isShared ? $context->record : $proposal->client)) {
-            throw new SendException(['sendable' => 'Общую презентацию можно отправить только клиенту из CRM: выберите контакт лида, компании или клиента '
+            throw new SendException(['sendable' => 'Общую презентацию можно отправить только клиенту из CRM: выберите контакт сделки, компании или клиента '
                 .'или откройте отправку из его карточки. Тогда открытие ссылки попадёт в его ленту.']);
         }
         if (!$send->save()) {

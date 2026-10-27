@@ -159,7 +159,7 @@ class ProposalSendableSource implements SendableSourceInterface, CampaignSourceI
         } elseif ($record instanceof CmsUser) {
             $proposal->cms_user_id = (int)$record->id;
         } else {
-            throw new SendException(['sendable' => 'КП можно сделать только для лида, компании, сделки или клиента.']);
+            throw new SendException(['sendable' => 'КП можно сделать только для сделки, компании, услуги или клиента.']);
         }
         if (!$proposal->save()) {
             throw new SendException(['sendable' => 'КП из шаблона не создано: '.implode(' ', $proposal->getErrorSummary(true))]);

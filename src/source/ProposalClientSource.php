@@ -129,10 +129,10 @@ class ProposalClientSource implements RecordSourceInterface, RecordOriginInterfa
     public function describe($source): string
     {
         if ($source instanceof CmsLead) {
-            return 'Для лида «'.$source->name.'»';
+            return 'Для сделки «'.$source->name.'»';
         }
         if ($source instanceof CmsDeal) {
-            return 'Для сделки «'.$source->name.'»';
+            return 'Для услуги «'.$source->name.'»';
         }
         if ($source instanceof CmsUser) {
             return 'Для клиента «'.$source->shortDisplayName.'»';

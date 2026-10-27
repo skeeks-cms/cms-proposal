@@ -27,7 +27,7 @@ class ProposalReadToolProvider extends Component implements McpToolProviderInter
         return [
             $this->tool('cms_proposal_list',
                 'Предложения CRM — коммерческие предложения (kind=proposal, КП) и Презентации (kind=presentation, страница сайта по личной ссылке), видимые сотруднику, новые первыми. '
-                .'Фильтры: клиент (record_type + record_id: лид, компания — вместе с её лидами и сделками, клиент-человек; включая отправленные ему общие Презентации), shared=true — общие Презентации для всех, '
+                .'Фильтры: клиент (record_type + record_id: сделка (lead), компания — вместе с её сделками и услугами (deal), клиент-человек; включая отправленные ему общие Презентации), shared=true — общие Презентации для всех, '
                 .'kind, status (draft, sent, opened, accepted, rejected, expired), sent (true — отправлялись), responsible_id, q (номер или название), date_from/date_to (создание). '
                 .'По каждому: номер, название, статус, клиент, сумма текущей версии КП или адрес страницы Презентации, отправки, честные открытия (без проверок ссылок почтовыми службами), принятие. '
                 .'Пример: {"record_type":"company","record_id":15}.',
