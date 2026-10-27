@@ -18,6 +18,14 @@ return [
             // "Создать КП" from a lead, company or deal: ?source=proposal-client:lead.15 in the standard create window.
             'recordSources' => [ProposalClientSource::TYPE => ProposalClientSource::class],
         ],
+        // Kinds of notifications of the responsible employee (services\ProposalNotifier).
+        'notifications' => [
+            'kinds' => [
+                'proposal.opened' => ['name' => 'Клиент открыл предложение', 'category' => 'clients'],
+                'proposal.accepted' => ['name' => 'Клиент принял КП', 'category' => 'clients', 'importance' => 1],
+                'proposal.question' => ['name' => 'Вопрос клиента по предложению', 'category' => 'clients', 'importance' => 1],
+            ],
+        ],
         // "Отправить клиенту" and "Прикрепить из… → Предложение" of skeeks/cms-communication.
         'communication' => [
             'sendables' => [ProposalSendableSource::TYPE => ProposalSendableSource::class],

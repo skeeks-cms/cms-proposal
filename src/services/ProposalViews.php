@@ -149,15 +149,18 @@ class ProposalViews
         $what = $proposal->isPresentation ? 'презентацию №'.(int)$proposal->number.($proposal->name ? ' — '.$proposal->name : '') : $proposal->asText;
         // A presentation for everybody: say who opened it.
         $who = $proposal->isShared && ($name = $send->clientName) !== '' ? $name.': ' : '';
-        ProposalNotifier::notify($proposal, $who.($who !== '' ? 'клиент' : 'Клиент').' открыл '.$what.' ('.mb_strtolower($send->channelName).')',
-            $send->recipientText !== '' ? 'Отправлено: '.$send->recipientText : null);
+        // "Клиент открыл" and the call task that follows are one entry of the bell and one message.
+        \Yii::$app->notifications->group('proposal-send:'.(int)$send->id, static function () use ($proposal, $send, $who, $what, $now) {
+            ProposalNotifier::notify($proposal, $who.($who !== '' ? 'клиент' : 'Клиент').' открыл '.$what.' ('.mb_strtolower($send->channelName).')',
+                $send->recipientText !== '' ? 'Отправлено: '.$send->recipientText : null);
 
-        // The view stays recorded whatever happens to the task: the client must not see an error.
-        try {
-            (new ProposalTasks())->onFirstView($proposal, $send, $now);
-        } catch (\Throwable $e) {
-            \Yii::error('Задача по открытию предложения #'.(int)$proposal->id.' не поставлена: '.$e->getMessage(), self::class);
-        }
+            // The view stays recorded whatever happens to the task: the client must not see an error.
+            try {
+                (new ProposalTasks())->onFirstView($proposal, $send, $now);
+            } catch (\Throwable $e) {
+                \Yii::error('Задача по открытию предложения #'.(int)$proposal->id.' не поставлена: '.$e->getMessage(), self::class);
+            }
+        });
 
         return self::RESULT_FIRST;
     }

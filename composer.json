@@ -18,9 +18,9 @@
     ],
     "require": {
         "php": ">=8.0",
-        "skeeks/cms": "^6.4.9.66",
+        "skeeks/cms": "^6.4.9.70",
         "skeeks/cms-backend": "^2.1.1.22",
-        "skeeks/cms-communication": "^1.9",
+        "skeeks/cms-communication": "^1.19",
         "kartik-v/yii2-mpdf": "^1.0.6"
     },
     "conflict": {

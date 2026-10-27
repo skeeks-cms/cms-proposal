@@ -65,6 +65,9 @@ new \yii\console\Application([
         'db' => ['class' => \yii\db\Connection::class, 'dsn' => 'sqlite::memory:'],
         'cache' => ['class' => \yii\caching\ArrayCache::class],
         'skeeks' => ['class' => \skeeks\cms\Skeeks::class],
+        // Kinds of the package as its config registers them.
+        'notifications' => ['class' => \skeeks\cms\notify\Notifications::class,
+            'kinds' => (require dirname(__DIR__).'/src/config/common.php')['components']['notifications']['kinds']],
         // Core models translate their messages; the test reads them as written.
         'i18n' => ['translations' => ['*' => ['class' => \yii\i18n\PhpMessageSource::class, 'basePath' => sys_get_temp_dir()]]],
     ],

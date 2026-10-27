@@ -85,7 +85,7 @@ class ProposalAnswers
         ], $send);
         ProposalNotifier::notify($proposal, 'Клиент принял '.$proposal->asText,
             'Версия '.(int)$version->version.', '.ProposalItems::money($version->amount, (string)$version->currency_code)
-            .'. Ссылка: '.mb_strtolower($send->channelName).($send->recipientText !== '' ? ', '.$send->recipientText : ''));
+            .'. Ссылка: '.mb_strtolower($send->channelName).($send->recipientText !== '' ? ', '.$send->recipientText : ''), 'proposal.accepted');
 
         return true;
     }
@@ -135,7 +135,7 @@ class ProposalAnswers
                 (new \skeeks\cms\proposal\send\ProposalSendable($proposal))->getSendRecords());
             $question->updateAttributes(['cms_comm_message_id' => (int)$message->id]);
 
-            ProposalNotifier::notify($proposal, 'Вопрос клиента по '.$proposal->asText, mb_substr($text, 0, 500));
+            ProposalNotifier::notify($proposal, 'Вопрос клиента по '.$proposal->asText, mb_substr($text, 0, 500), 'proposal.question');
             $transaction->commit();
         } catch (\Throwable $e) {
             $transaction->rollBack();

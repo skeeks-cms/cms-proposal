@@ -27,19 +27,21 @@ class ProposalNotifier
         return $id ?: null;
     }
 
-    public static function notify(CmsProposal $proposal, string $name, ?string $comment = null): ?CmsWebNotify
+    /**
+     * @param string $kind proposal.opened, proposal.accepted, proposal.question
+     */
+    public static function notify(CmsProposal $proposal, string $name, ?string $comment = null, string $kind = 'proposal.opened'): ?CmsWebNotify
     {
         $userId = self::recipientId($proposal);
         if (!$userId) {
             return null;
         }
-        $notify = new CmsWebNotify();
-        $notify->cms_user_id = $userId;
-        $notify->name = mb_substr($name, 0, 250);
-        $notify->comment = $comment !== null ? mb_substr($comment, 0, 1000) : null;
-        $notify->model_code = CmsProposal::class;
-        $notify->model_id = (int)$proposal->id;
+        $rows = \Yii::$app->notifications->notify($userId, $kind, [
+            'name' => $name,
+            'comment' => $comment,
+            'model' => $proposal,
+        ]);
 
-        return $notify->save() ? $notify : null;
+        return $rows[0] ?? null;
     }
 }
