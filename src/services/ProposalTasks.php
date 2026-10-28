@@ -63,7 +63,7 @@ class ProposalTasks
         return CmsTask::getDb()->transaction(function () use ($proposal, $send, $executor, $now) {
             $task = new CmsTask();
             $client = $send->clientName !== '' ? $send->clientName : $proposal->getClientName();
-            $task->name = mb_substr('Позвонить: клиент открыл предложение №'.(int)$proposal->number
+            $task->name = mb_substr(($proposal->isPresentation ? 'Позвонить: смотрел Презентацию №' : 'Позвонить: клиент открыл предложение №').(int)$proposal->number
                 .($client !== '' ? ' — '.$client : ''), 0, 255);
             $task->executor_id = (int)$executor->id;
             // A task to oneself is accepted at once; the client page has no signed-in user.

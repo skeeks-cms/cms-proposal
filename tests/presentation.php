@@ -122,7 +122,7 @@ proposalExpect($presentation->status === CmsProposal::STATUS_OPENED && $notifies
 $links = CmsProposalTask::find()->andWhere(['cms_proposal_id' => (int)$presentation->id])->with('task')->all();
 proposalExpect(count($links) === 1 && (int)$links[0]->cms_proposal_send_id === (int)$pSend->id, 'The first view gives a task linked to the proposal and the sending.');
 $task = $links[0]->task;
-proposalExpect($task->name === 'Позвонить: клиент открыл предложение №'.$presentation->number.' — Без компании' && (int)$task->executor_id === 1
+proposalExpect($task->name === 'Позвонить: смотрел Презентацию №'.$presentation->number.' — Без компании' && (int)$task->executor_id === 1
     && (int)$task->created_by === 1 && $task->status === CmsTask::STATUS_ACCEPTED && (int)$task->cms_lead_id === 21 && !$task->cms_company_id,
     'The call task is the responsible employee\'s own, accepted, of the lead: '.$task->name);
 proposalExpect((int)$task->plan_start_at >= time() + 30 * 60 && str_contains((string)$task->description, 'презентацию'), 'The task starts no sooner than the task rule allows.');

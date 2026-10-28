@@ -146,6 +146,15 @@ class ProposalViews
         }
         $data = ['channel' => (string)$send->channel, 'send' => (int)$send->id, 'recipient' => $send->recipientText];
         ProposalFeed::write($proposal, ProposalFeed::EVENT_OPENED, $data, $send);
+        if ($send->cms_comm_message_id && class_exists(\skeeks\cms\communication\services\Audience::class)) {
+            // A signal of interest of a letter's recipient: the company or contact is warm (cms-communication), no deal.
+            try {
+                \skeeks\cms\communication\services\Audience::warmByMessage((int)$send->cms_comm_message_id, $proposal->isPresentation
+                    ? \skeeks\cms\communication\models\CmsCommAudience::WARM_PRESENTATION : \skeeks\cms\communication\models\CmsCommAudience::WARM_OFFER, $now);
+            } catch (\Throwable $e) {
+                \Yii::error('Отметка «тёплый» по открытию предложения #'.(int)$proposal->id.' не поставлена: '.$e->getMessage(), self::class);
+            }
+        }
         $what = $proposal->isPresentation ? 'презентацию №'.(int)$proposal->number.($proposal->name ? ' — '.$proposal->name : '') : $proposal->asText;
         // A presentation for everybody: say who opened it.
         $who = $proposal->isShared && ($name = $send->clientName) !== '' ? $name.': ' : '';
