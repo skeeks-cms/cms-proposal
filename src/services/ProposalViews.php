@@ -154,6 +154,14 @@ class ProposalViews
             } catch (\Throwable $e) {
                 \Yii::error('Отметка «тёплый» по открытию предложения #'.(int)$proposal->id.' не поставлена: '.$e->getMessage(), self::class);
             }
+            // П2д: a campaign may make a deal on this view (its setting «Создавать сделку при просмотре», off by default).
+            if (method_exists(\skeeks\cms\communication\services\Campaigns::class, 'onOfferView')) {
+                try {
+                    \skeeks\cms\communication\services\Campaigns::onOfferView((int)$send->cms_comm_message_id, $now);
+                } catch (\Throwable $e) {
+                    \Yii::error('Сделка по просмотру предложения #'.(int)$proposal->id.' не создана: '.$e->getMessage(), self::class);
+                }
+            }
         }
         $what = $proposal->isPresentation ? 'презентацию №'.(int)$proposal->number.($proposal->name ? ' — '.$proposal->name : '') : $proposal->asText;
         // A presentation for everybody: say who opened it.

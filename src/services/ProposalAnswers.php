@@ -86,6 +86,7 @@ class ProposalAnswers
         ProposalNotifier::notify($proposal, 'Клиент принял '.$proposal->asText,
             'Версия '.(int)$version->version.', '.ProposalItems::money($version->amount, (string)$version->currency_code)
             .'. Ссылка: '.mb_strtolower($send->channelName).($send->recipientText !== '' ? ', '.$send->recipientText : ''), 'proposal.accepted');
+        self::campaignRequest($send, 'Принял '.$proposal->asText.', версия '.(int)$version->version.'.');
 
         return true;
     }
@@ -141,8 +142,28 @@ class ProposalAnswers
             $transaction->rollBack();
             throw $e;
         }
+        self::campaignRequest($send, 'Вопрос по '.$proposal->asText.': '.mb_substr($text, 0, 500).($contact !== '' ? "\nКак связаться: ".$contact : ''), $message);
 
         return $question;
+    }
+
+    /**
+     * A question or an acceptance on the page of an offer sent in a mailing
+     * campaign is a request from the letter (П2д): the open deal of the
+     * client continues, otherwise a deal of the sender or «Неразобранное»
+     * (cms-communication Campaigns::onOfferRequest()).
+     */
+    private static function campaignRequest(CmsProposalSend $send, string $what, $message = null): void
+    {
+        $campaigns = \skeeks\cms\communication\services\Campaigns::class;
+        if (!$send->cms_comm_message_id || !method_exists($campaigns, 'onOfferRequest')) {
+            return;
+        }
+        try {
+            $campaigns::onOfferRequest((int)$send->cms_comm_message_id, $what, $message);
+        } catch (\Throwable $e) {
+            \Yii::error('Заявка из рассылки по ссылке #'.(int)$send->id.' не создана: '.$e->getMessage(), self::class);
+        }
     }
 
     private function checkLimits(CmsProposalSend $send, string $ip): void
