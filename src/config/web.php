@@ -18,7 +18,7 @@ return [
                         'items' => [
                             'proposals' => [
                                 'label' => 'Предложения',
-                                'priority' => 210,
+                                'priority' => 170,
                                 'img' => ['\skeeks\cms\assets\CmsAsset', 'images/icons/admin-menu/receipt.svg'],
                                 'url' => ['cmsProposal/admin-cms-proposal'],
                             ],
