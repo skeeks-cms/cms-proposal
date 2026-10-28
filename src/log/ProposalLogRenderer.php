@@ -27,7 +27,7 @@ use yii\helpers\Html;
  * ссылок" for an opening that looks like a mail service. The proposal is
  * named and linked only for employees who may see it.
  */
-class ProposalLogRenderer extends CmsLogEntryRenderer
+class ProposalLogRenderer extends CmsLogEntryRenderer implements \skeeks\cms\log\CmsLogFeedVisibilityInterface
 {
     /** Icon and tone of each event in the shared feed entry. */
     private const LOOK = [
@@ -105,5 +105,16 @@ class ProposalLogRenderer extends CmsLogEntryRenderer
         }
 
         return $entry;
+    }
+
+    /**
+     * A limited client feed ("Свои сделки", the pool) shows a proposal entry
+     * only of a proposal the employee sees (CmsProposalQuery::forManager()).
+     */
+    public function feedVisibleCondition($user, string $logTable): array
+    {
+        $id = new \yii\db\Expression("CAST(JSON_UNQUOTE(JSON_EXTRACT({$logTable}.data, '$.id')) AS UNSIGNED)");
+
+        return ['in', $id, CmsProposal::find()->forManager($user)->select(CmsProposal::tableName().'.id')];
     }
 }

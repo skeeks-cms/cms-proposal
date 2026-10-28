@@ -51,17 +51,21 @@ class CmsProposalQuery extends CmsActiveQuery
             $managerIds[] = (int)$subordinate->id;
         }
         $table = $this->getPrimaryTableName();
+        $managerIds = array_values(array_unique($managerIds));
         $leads = CmsLead::find()->forManager($user)->select(CmsLead::tableName().'.id');
-        // A proposal of a deal follows the deal: a client seen with "Свои сделки" does not open
-        // the proposals of other employees' deals (CmsLeadQuery::forManager()).
+        // A proposal of a deal follows the deal: a client seen in full does not open the proposals
+        // of deals hidden from him (CmsLeadQuery::forManager()).
         $ownLeadOrNone = ['or', [$table.'.cms_lead_id' => null], [$table.'.cms_lead_id' => $leads]];
+        // A client seen in full, or "своё" for the level "Свои сделки" (CrmAccess::clientRecordCondition()):
+        // his proposals (responsible or author), of his deals, of the services he sees.
+        $client = \skeeks\cms\crm\CrmAccess::instance()->clientRecordCondition($user, $table);
 
         return $this->andWhere(['or',
-            [$table.'.responsible_id' => array_values(array_unique($managerIds))],
+            [$table.'.responsible_id' => $managerIds],
+            [$table.'.created_by' => $managerIds],
             [$table.'.cms_lead_id' => $leads],
-            ['and', [$table.'.cms_company_id' => CmsCompany::find()->forManager($user)->select(CmsCompany::tableName().'.id')], $ownLeadOrNone],
+            ['and', $client, $ownLeadOrNone],
             [$table.'.cms_deal_id' => CmsDeal::find()->forManager($user)->select(CmsDeal::tableName().'.id')],
-            ['and', [$table.'.cms_user_id' => CmsUser::find()->forManager($user)->select(CmsUser::tableName().'.id')], $ownLeadOrNone],
             // A presentation for everybody is a material of the whole team.
             self::sharedCondition($table),
         ]);
