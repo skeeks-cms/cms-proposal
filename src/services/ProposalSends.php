@@ -50,6 +50,10 @@ class ProposalSends
             throw new SendException(['sendable' => 'Общую презентацию можно отправить только клиенту из CRM: выберите контакт сделки, компании или клиента '
                 .'или откройте отправку из его карточки. Тогда открытие ссылки попадёт в его ленту.']);
         }
+        // A closed deal: «Свои сделки» and "edit" return it to work first — a refusal, not a server error.
+        if ($send->cms_lead_id && ($error = CmsProposal::leadActionError($send->cms_lead_id))) {
+            throw new SendException(['sendable' => $error]);
+        }
         if (!$send->save()) {
             throw new \RuntimeException('Не удалось создать ссылку на КП: '.implode(' ', $send->getErrorSummary(true)));
         }

@@ -92,6 +92,12 @@ class CmsProposalSend extends \skeeks\cms\base\ActiveRecord
                     $this->addError($attribute, $error);
                 }
             }, 'skipOnEmpty' => false],
+            // Sent within a deal: who works on it, a closed deal only for who acts on its client (CmsProposal::leadActionError()).
+            [['cms_lead_id'], function ($attribute) {
+                if ($this->isNewRecord && $this->cms_lead_id && ($error = CmsProposal::leadActionError($this->cms_lead_id))) {
+                    $this->addError($attribute, $error);
+                }
+            }, 'skipOnEmpty' => false],
         ];
     }
 

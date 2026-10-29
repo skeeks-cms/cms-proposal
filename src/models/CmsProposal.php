@@ -301,7 +301,20 @@ class CmsProposal extends \skeeks\cms\base\ActiveRecord
                 || $this->isAttributeChanged('cms_user_id')) && ($error = self::clientActionError($this->cms_company_id, $this->cms_user_id))) {
             // «Свои сделки» and "edit" make a proposal of a client only in their deal (core CrmAccess::canActOnClient()).
             $this->addError($attribute, $error);
+        } elseif ($this->cms_lead_id && ($this->isNewRecord || $this->isAttributeChanged('cms_lead_id'))
+            && ($error = self::leadActionError($this->cms_lead_id))) {
+            // In a deal: who works on it, a closed deal only for who acts on its client (cms-communication LeadActions).
+            $this->addError($attribute, $error);
         }
+    }
+
+    /** The refusal of a new proposal or sending in the deal for the acting employee (LeadActions), null when allowed. */
+    public static function leadActionError($leadId): ?string
+    {
+        $rule = \skeeks\cms\communication\services\LeadActions::class;
+        $lead = $leadId && class_exists($rule) ? CmsLead::findOne((int)$leadId) : null;
+
+        return $lead ? $rule::actingError($lead) : null;
     }
 
     /** The refusal of an action on a company or a person without an own deal (core CrmAccess::clientActionError()), null when allowed. */
