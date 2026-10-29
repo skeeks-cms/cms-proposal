@@ -85,6 +85,13 @@ class CmsProposalSend extends \skeeks\cms\base\ActiveRecord
             [['code'], 'string', 'max' => 64],
             [['code'], 'unique'],
             [['views_count'], 'default', 'value' => 0],
+            // Sent to a company or a person: «Свои сделки» and "edit" send only within their deal (cms_lead_id).
+            [['cms_company_id'], function ($attribute) {
+                if ($this->isNewRecord && !$this->cms_lead_id && !$this->cms_deal_id && ($this->cms_company_id || $this->cms_user_id)
+                    && ($error = CmsProposal::clientActionError($this->cms_company_id, $this->cms_user_id))) {
+                    $this->addError($attribute, $error);
+                }
+            }, 'skipOnEmpty' => false],
         ];
     }
 

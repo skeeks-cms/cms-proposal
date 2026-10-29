@@ -297,7 +297,22 @@ class CmsProposal extends \skeeks\cms\base\ActiveRecord
             $this->addError($attribute, 'Выберите клиента: сделку, компанию, услугу или клиента-человека.');
         } elseif (count($filled) > 1) {
             $this->addError($attribute, 'Выберите одного клиента: сделку, компанию, услугу или клиента-человека.');
+        } elseif (($this->cms_company_id || $this->cms_user_id) && ($this->isNewRecord || $this->isAttributeChanged('cms_company_id')
+                || $this->isAttributeChanged('cms_user_id')) && ($error = self::clientActionError($this->cms_company_id, $this->cms_user_id))) {
+            // «Свои сделки» and "edit" make a proposal of a client only in their deal (core CrmAccess::canActOnClient()).
+            $this->addError($attribute, $error);
         }
+    }
+
+    /** The refusal of an action on a company or a person without an own deal (core CrmAccess::clientActionError()), null when allowed. */
+    public static function clientActionError($companyId, $clientId): ?string
+    {
+        $access = \skeeks\cms\crm\CrmAccess::class;
+        if (!class_exists($access) || !method_exists($access, 'clientActionError')) {
+            return null;
+        }
+
+        return $access::instance()->clientActionError($companyId ? (int)$companyId : null, $companyId ? null : ($clientId ? (int)$clientId : null), null);
     }
 
     public function attributeLabels()
