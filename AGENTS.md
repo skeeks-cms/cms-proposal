@@ -1,7 +1,8 @@
 # CMS Proposal development
 
-Read README.md and `skeeks/cms-communication/ARCHITECTURE.md` ("КП (реестр
-предложений)", "Отправить клиенту") before changing this package. Follow the
+Read README.md, the platform plan `crm/proposals.md`
+(https://github.com/skeeks-cms/platform-plan) and `skeeks/cms-communication/ARCHITECTURE.md`
+("Отправить клиенту") before changing this package. Follow the
 active shared-vendor skeeks-cms-package-development skill
 (`references/crm-card-blocks.md` describes the card block, the record source
 and the versioned document contracts this package established).
