@@ -69,7 +69,7 @@ class ProposalTasks
             // A task to oneself is accepted at once; the client page has no signed-in user.
             $task->created_by = (int)$executor->id;
             $this->fillClient($task, $send->client ?: $proposal->client);
-            $task->plan_start_at = self::dueAt(is_array($executor->work_shedule) ? $executor->work_shedule : null, $now);
+            $task->plan_start_at = self::startFor($executor, $now);
             $task->plan_duration = self::CALL_DURATION;
             $task->description = $this->description($proposal, $send, $now);
             if (!$task->save()) {
@@ -118,7 +118,23 @@ class ProposalTasks
     }
 
     /**
-     * When to call: today within the working hours, otherwise at the start
+     * The start of the call: the nearest free time of the executor's schedule after MIN_LEAD_SECONDS
+     * (cms TaskPlanner, the one calculation of task starts); an older cms — the schedule only.
+     */
+    public static function startFor(CmsUser $executor, int $now): int
+    {
+        if (class_exists(\skeeks\cms\services\TaskPlanner::class)) {
+            $planner = new \skeeks\cms\services\TaskPlanner();
+            $planner->now = $now;
+
+            return $planner->nearestStart($executor, self::CALL_DURATION, $now + self::MIN_LEAD_SECONDS);
+        }
+
+        return self::dueAt(is_array($executor->work_shedule) ? $executor->work_shedule : null, $now);
+    }
+
+    /**
+     * When to call by the schedule only: today within the working hours, otherwise at the start
      * of the nearest working period. Never sooner than MIN_LEAD_SECONDS.
      */
     public static function dueAt(?array $schedule, int $now): int
