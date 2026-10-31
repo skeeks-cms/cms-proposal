@@ -8,6 +8,7 @@
 namespace skeeks\cms\proposal\controllers;
 
 use kartik\datecontrol\DateControl;
+use skeeks\cms\widgets\formInputs\datetime\DateTimeInputWidget;
 use skeeks\cms\backend\actions\BackendModelAction;
 use skeeks\cms\backend\actions\BackendModelUpdateAction;
 use skeeks\cms\backend\controllers\BackendModelStandartController;
@@ -648,9 +649,10 @@ class AdminCmsProposalController extends BackendModelStandartController
                 },
             ],
         ];
+        // The platform date field; an older skeeks/cms without it keeps DateControl.
         $validUntil = [
             'class' => WidgetField::class,
-            'widgetClass' => DateControl::class,
+            'widgetClass' => class_exists(DateTimeInputWidget::class) ? DateTimeInputWidget::class : DateControl::class,
             'widgetConfig' => ['type' => DateControl::FORMAT_DATE],
         ];
 
